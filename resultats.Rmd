@@ -1,0 +1,111 @@
+---
+title: "TER - Résultats"
+output: 
+  prettydoc::html_pretty:
+    theme: hpstr
+---
+
+```{r, echo=FALSE, warning=FALSE}
+
+library(prettydoc)
+library(tidyverse)
+library(formattable)
+
+```
+
+
+# N-Back
+
+## Épuisement
+
+```{r, echo=FALSE, warning=FALSE}
+
+nback <- read.csv2("data/nback.csv", sep = ",", fileEncoding="UTF-8-BOM")
+
+nback$groupe <- as.factor(nback$groupe)
+nback$subject_id <- as.factor(nback$subject_id)
+nback$part <- factor(nback$part, levels = c("2-back-pre", "2-back-post"))
+nback$id_2_back <- as.factor(nback$id_2_back)
+nback$trial_id <- as.factor(nback$trial_id)
+
+nback[is.na(nback)] <- 0
+
+nback <- nback %>%
+  filter(subject_id != 13) # trop de no-input
+
+nback_summary <- nback %>%
+  group_by(groupe, part) %>%
+  summarize_if(is.numeric, mean)
+
+nback_transc <- nback %>%
+  filter(groupe == "transc")
+
+nback_control <- nback %>%
+  filter(groupe == "control")
+
+nback_transc_summary <- nback_transc %>%
+  select(-groupe) %>%
+  group_by(part) %>%
+  summarize_if(is.numeric, mean)
+
+formattable(nback_transc_summary)
+
+
+```
+
+## Contrôle
+
+```{r, echo=FALSE, warning=FALSE}
+nback_control_summary <- nback_control %>%
+  select(-groupe) %>%
+  group_by(part) %>%
+  summarize_if(is.numeric, mean)
+
+formattable(nback_control_summary)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

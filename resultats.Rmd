@@ -1,24 +1,24 @@
 ---
 title: "TER - Résultats"
 output: 
-  prettydoc::html_pretty:
-    theme: hpstr
+  html_notebook:
+    theme: spacelab
+    code_folding: hide
 ---
 
-```{r, echo=FALSE, warning=FALSE}
+```{r}
 
-library(prettydoc)
 library(tidyverse)
-library(formattable)
+library(ggpubr)
+library(rstatix)
 
 ```
 
 
 # N-Back
 
-## Épuisement
 
-```{r, echo=FALSE, warning=FALSE}
+```{r}
 
 nback <- read.csv2("data/nback.csv", sep = ",", fileEncoding="UTF-8-BOM")
 
@@ -43,27 +43,61 @@ nback_transc <- nback %>%
 nback_control <- nback %>%
   filter(groupe == "control")
 
-nback_transc_summary <- nback_transc %>%
-  select(-groupe) %>%
-  group_by(part) %>%
-  summarize_if(is.numeric, mean)
-
-formattable(nback_transc_summary)
+nback_summary
 
 
 ```
 
-## Contrôle
+## Temps de réponse
 
-```{r, echo=FALSE, warning=FALSE}
-nback_control_summary <- nback_control %>%
-  select(-groupe) %>%
-  group_by(part) %>%
-  summarize_if(is.numeric, mean)
+```{r}
 
-formattable(nback_control_summary)
+nback_rt <- nback
+
+out_rt <- boxplot.stats(nback_rt$rt)$out
+
+
+nback_rt <- nback_rt %>%
+  filter(!rt %in% out_rt)
+
+ggboxplot(nback_rt, x = "groupe", y = "rt", fill = "part")
+
 ```
 
+```{r}
+
+ggdensity(nback_rt, x = "rt", fill = "part", main = "Densité RT", facet.by = "groupe")
+
+```
+```{r}
+
+ggqqplot(nback_rt, x = "rt", facet.by = c("groupe", "part"))
+
+```
+
+### Shapiro
+
+```{r}
+
+nback_rt %>%
+  group_by(groupe, part) %>%
+  shapiro_test(rt)
+
+```
+
+
+
+```{r}
+
+ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_sd", main = "RT moyens")
+
+```
+
+```{r}
+
+
+
+```
 
 
 

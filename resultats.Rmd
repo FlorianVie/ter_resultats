@@ -1,5 +1,5 @@
 ---
-title: "TER - Résultats"
+title: "TER - Résultats - nback"
 output: 
   html_notebook:
     theme: default
@@ -54,6 +54,14 @@ nback_summary
 
 nback_rt <- nback
 
+nback_rt %>%
+  group_by(groupe, part) %>%
+  get_summary_stats(rt)
+
+```
+
+```{r}
+
 out_rt <- boxplot.stats(nback_rt$rt)$out
 
 
@@ -61,6 +69,7 @@ nback_rt <- nback_rt %>%
   filter(!rt %in% out_rt)
 
 ggboxplot(nback_rt, x = "groupe", y = "rt", fill = "part")
+
 
 ```
 
@@ -93,32 +102,114 @@ ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_d
 
 ```
 
+
+
+
 ```{r}
 
-nback_rt %>%
-  group_by(groupe, part) %>%
-  cor_test(rt)
+rt_model <- lm(data = nback_rt, rt~part+groupe)
+ggqqplot(residuals(rt_model), main = "Résidus - qqplot")
+
+```
+
+### Wilconxon
+
+#### Effet du groupe
+
+```{r}
+
+rt_kruskal_g <- nback_rt %>%
+  group_by(part) %>%
+  wilcox_test(rt ~ groupe)
+
+rt_kruskal_g
 
 ```
 
 
+#### Effet post-test
+
+```{r}
+
+rt_kruskal_t <- nback %>%
+  group_by(groupe) %>%
+  wilcox_test(rt ~ part, paired = T)
+
+rt_kruskal_t
+
+```
 
 
+## Performances
 
 
+```{r}
+nback_score <- nback %>%
+  group_by(groupe, subject_id, part, id_2_back) %>%
+  summarise_if(is.numeric, mean)
+
+nback_score %>%
+  group_by(groupe, part) %>%
+  get_summary_stats(Score)
+```
+
+```{r}
+ggboxplot(nback_score, x = "groupe", y = "Score", fill = "part")
+```
 
 
+```{r}
+ggdensity(nback_score, x = "Score", fill = "part", main = "Densité Performances", facet.by = "groupe")
+```
+
+```{r}
+ggqqplot(nback_score, x = "Score", facet.by = c("groupe", "part"))
+```
+
+### Shapiro
+
+```{r}
+nback_score %>%
+  group_by(groupe, part) %>%
+  shapiro_test(Score)
+```
 
 
+```{r}
+ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_sd", main = "Performances moyennes")
+```
 
 
+```{r}
+sc_model <- lm(data = nback_score, Score~part+groupe)
+ggqqplot(residuals(sc_model), main = "Résidus - qqplot")
+```
 
 
+### Wilconxon
+
+#### Effet du groupe
+
+```{r}
+
+sc_kruskal_g <- nback_score %>%
+  group_by(part) %>%
+  wilcox_test(Score ~ groupe)
+sc_kruskal_g
+
+```
 
 
+#### Effet post-test
 
+```{r}
 
+sc_kruskal_t <- nback_score %>%
+  group_by(groupe) %>%
+  wilcox_test(Score ~ part, paired = T)
+sc_kruskal_t
 
+```
 
 
 

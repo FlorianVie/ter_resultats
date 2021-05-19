@@ -1,0 +1,104 @@
+---
+title: "TER - Résultats - rspan"
+output: 
+  html_notebook:
+    theme: default
+    code_folding: hide
+---
+
+```{r}
+
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+
+```
+
+# RSPAN
+
+## Phrases
+
+### Retranscription
+
+```{r}
+rspan <- read.csv2("data/retran_rspan.csv", sep = ",")
+rspan$subject_id <- as.factor(rspan$subject_id)
+rspan$rt <- as.numeric(rspan$rt)
+rspan[is.na(rspan)] <- 0
+rspan$part <- factor(rspan$part, levels = c("sentence-pre", "sentence-post"))
+
+rspan_scored <- read.csv2("data/retran_rspan_scored.csv", sep = ",")
+rspan <- rspan %>%
+  select(subject_id, part, time_elapsed, rt, set_number, size, correct, letters_recalled, correct_letters) %>%
+  filter(part != "") %>%
+  filter(part != "instruction") %>%
+  filter(part != "Pause") %>%
+  filter(part != "Beep Beep Beep") %>%
+  filter(part != "Audio") %>%
+  filter(part != "Retranscription") %>%
+  filter(part != "letter-pre") %>%
+  filter(part != "letter-post")
+
+rspan_wm <- rspan %>%
+  filter(part != "sentence-pre")%>%
+  filter(part != "sentence-post")
+
+rspan_sent <- rspan %>%
+  filter(part != "recall-pre")%>%
+  filter(part != "recall-post") %>%
+  select(subject_id, part, rt, correct)
+  
+```
+
+```{r}
+rspan_sent %>%
+  group_by(part) %>%
+  get_summary_stats(correct)
+```
+
+
+```{r}
+rspan_sent %>%
+  group_by(part) %>%
+  get_summary_stats(rt)
+```
+
+```{r}
+
+ggdensity(rspan_sent, x = "rt", fill = "part", main = "Densité RT")
+
+```
+
+```{r}
+
+ggqqplot(rspan_sent, x = "rt", facet.by = c("part"))
+
+```
+
+```{r}
+
+ggdensity(rspan_sent, x = "correct", fill = "part", main = "Densité RT")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

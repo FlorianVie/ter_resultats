@@ -2,7 +2,7 @@
 title: "TER - Résultats"
 output: 
   html_notebook:
-    theme: spacelab
+    theme: default
     code_folding: hide
 ---
 
@@ -95,7 +95,9 @@ ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_d
 
 ```{r}
 
-
+nback_rt %>%
+  group_by(groupe, part) %>%
+  cor_test(rt)
 
 ```
 

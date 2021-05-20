@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggpubr)
 
 rspan <- read.csv2("./data/retran_rspan.csv", sep = ",")
 rspan_scored <- read.csv2("./data/retran_rspan_scored.csv", sep = ",")
@@ -17,9 +18,13 @@ rspan_wm <- rspan %>%
   filter(part != "sentence-pre")%>%
   filter(part != "sentence-post")
 
+ggbarplot(rspan_wm, x = "part", y = "correct", add = "mean_sd", fill = "part")
+
 rspan_sent <- rspan %>%
   filter(part != "recall-pre")%>%
   filter(part != "recall-post")
+
+ggbarplot(rspan_sent, x = "part", y = "correct", add = "mean_sd", fill = "part", main = "RSPAN Phrases - Retranscription")
 
 sentences <- rspan_sent %>%
   group_by(part) %>%
@@ -30,17 +35,12 @@ sentences <- rspan_sent %>%
 
 sentences$part <- factor(sentences$part, levels = c("sentence-pre", "sentence-post"))
 
-p1 <- ggplot(sentences, aes(part, sentence_score)) +
-  geom_col(color="black", position = position_dodge(1), width=0.5) +
-  theme_minimal() +
-  xlab("Type de réponse") +
-  ylab("Nombre moyen") +
-  xlab("") +
-  ylab("Score moyen") +
-  ggtitle("RSPAN Phrases - Transcription")
-p1
+
+
 
 rspan_scored$PCU <- as.numeric(rspan_scored$PCU)
+
+ggbarplot(rspan_scored, x = "part", y = "PCL", add = "mean_sd", fill = "part", main = "RSPAN - Retranscription")
 
 rspan_wm <- rspan_scored %>%
   group_by(part) %>%

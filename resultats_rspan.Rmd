@@ -1,6 +1,8 @@
 ---
 title: "TER - Résultats - rspan"
-output: 
+output:
+  pdf_document: 
+    latex_engine: xelatex
   html_notebook:
     theme: default
     code_folding: hide
@@ -18,73 +20,86 @@ library(rstatix)
 
 ## Phrases
 
-### Retranscription
-
 ```{r}
-rspan <- read.csv2("data/retran_rspan.csv", sep = ",")
-rspan$subject_id <- as.factor(rspan$subject_id)
-rspan$rt <- as.numeric(rspan$rt)
-rspan[is.na(rspan)] <- 0
-rspan$part <- factor(rspan$part, levels = c("sentence-pre", "sentence-post"))
 
-rspan_scored <- read.csv2("data/retran_rspan_scored.csv", sep = ",")
-rspan <- rspan %>%
-  select(subject_id, part, time_elapsed, rt, set_number, size, correct, letters_recalled, correct_letters) %>%
-  filter(part != "") %>%
-  filter(part != "instruction") %>%
-  filter(part != "Pause") %>%
-  filter(part != "Beep Beep Beep") %>%
-  filter(part != "Audio") %>%
-  filter(part != "Retranscription") %>%
-  filter(part != "letter-pre") %>%
-  filter(part != "letter-post")
+rspan <- read.csv2("data/rspan_dist.csv", sep = ",", fileEncoding="UTF-8-BOM")
+rspan$part <- factor(rspan$part, levels = c("sentence-pre", "sentence-post", "recall-pre", "recall-post"))
+rspan$size <- factor(rspan$size, levels = c("4.0", "5.0", "6.0"))
+rspan$sim <- as.numeric(rspan$sim)
+rspan$dsit <- as.numeric(rspan$dist)
 
-rspan_wm <- rspan %>%
-  filter(part != "sentence-pre")%>%
-  filter(part != "sentence-post")
+recall <- rspan %>%
+  filter(part != 'sentence-pre') %>%
+  filter(part != 'sentence-post')
 
-rspan_sent <- rspan %>%
-  filter(part != "recall-pre")%>%
-  filter(part != "recall-post") %>%
-  select(subject_id, part, rt, correct)
-  
-```
+sent <- rspan %>%
+  filter(part != 'recall-pre') %>%
+  filter(part != 'recall-post')
 
-```{r}
-rspan_sent %>%
-  group_by(part) %>%
+sent %>%
+  group_by(groupe, part) %>%
   get_summary_stats(correct)
-```
-
-
-```{r}
-rspan_sent %>%
-  group_by(part) %>%
-  get_summary_stats(rt)
-```
-
-```{r}
-
-ggdensity(rspan_sent, x = "rt", fill = "part", main = "Densité RT")
 
 ```
 
 ```{r}
 
-ggqqplot(rspan_sent, x = "rt", facet.by = c("part"))
+ggdensity(sent, x = "correct", fill = "part", facet.by = "groupe")
+
+```
+
+
+```{r}
+
+ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_sd", position = position_dodge(0.8))
+
+```
+
+
+## Rappel
+
+```{r}
+
+ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"))
+
+```
+
+
+```{r}
+
+ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_sd", position = position_dodge(0.8))
 
 ```
 
 ```{r}
 
-ggdensity(rspan_sent, x = "correct", fill = "part", main = "Densité RT")
+ggboxplot(recall, x = "size", y = "sim", fill = "part", facet.by = "groupe")
 
 ```
 
 
+```{r}
+
+ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_sd", position = position_dodge(0.8), facet.by = "size")
+
+```
 
 
+```{r}
 
+recall %>%
+  group_by(groupe) %>%
+  wilcox_test(sim ~ part, paired = T)
+
+```
+
+```{r}
+
+recall %>%
+  group_by(groupe, size) %>%
+  wilcox_test(sim ~ part, paired = T)
+
+```
 
 
 

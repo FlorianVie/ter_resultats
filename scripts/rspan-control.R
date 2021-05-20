@@ -21,6 +21,9 @@ rspan_sent <- rspan %>%
   filter(part != "recall-pre")%>%
   filter(part != "recall-post")
 
+ggbarplot(rspan_sent, x = "part", y = "correct", add = "mean_sd", fill = "part", main = "RSPAN Phrases - Contrôle")
+
+
 sentences <- rspan_sent %>%
   group_by(part) %>%
   summarise(
@@ -41,6 +44,9 @@ p1 <- ggplot(sentences, aes(part, sentence_score)) +
 p1
 
 rspan_scored$PCU <- as.numeric(rspan_scored$PCU)
+
+ggbarplot(rspan_scored, x = "part", y = "PCL", add = "mean_sd", fill = "part", main = "RSPAN - Contrôle")
+
 
 rspan_wm <- rspan_scored %>%
   group_by(part) %>%

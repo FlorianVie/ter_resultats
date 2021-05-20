@@ -1,9 +1,10 @@
 ---
 title: "TER - Résultats - nback"
-output: 
+output:
   html_notebook:
     theme: default
     code_folding: hide
+  pdf_document: default
 ---
 
 ```{r}

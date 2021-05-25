@@ -1,0 +1,17 @@
+---
+title: "Expérience 2"
+output: html_notebook
+---
+
+
+
+```{r}
+
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+
+plot(cars)
+```
+
+

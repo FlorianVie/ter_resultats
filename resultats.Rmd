@@ -26,7 +26,7 @@ nback <- read.csv2("data/nback.csv", sep = ",", fileEncoding="UTF-8-BOM")
 
 nback$groupe <- as.factor(nback$groupe)
 nback$subject_id <- as.factor(nback$subject_id)
-nback$part <- factor(nback$part, levels = c("2-back-pre", "2-back-post"))
+nback$part <- factor(nback$part, levels = c("2_back_pre", "2_back_post"))
 nback$id_2_back <- as.factor(nback$id_2_back)
 nback$trial_id <- as.factor(nback$trial_id)
 
@@ -215,6 +215,24 @@ sc_kruskal_t
 
 
 
+# Delta
+
+```{r}
+
+nback_delta <- nback_score %>% 
+  group_by(groupe, subject_id, part) %>%
+  summarise(Score = mean(Score), rt = mean(rt)) %>%
+  pivot_wider(names_from = part, values_from = c(Score, rt)) %>%
+  mutate(Score_delta = Score_2_back_pre - Score_2_back_post) %>%
+  mutate(Score_delta = round(Score_delta, 4)) %>%
+  mutate(rt_delta = rt_2_back_pre - rt_2_back_post) %>%
+  mutate(rt_delta = round(rt_delta, 4))
+
+nback_delta %>%
+  group_by(groupe) %>%
+  summarise_if(is.numeric, c(mean))
+
+```
 
 
 

@@ -1,0 +1,102 @@
+---
+title: "Vincentisation"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(xtable)
+
+nback <- read.csv2("data/nback.csv", sep = ",", fileEncoding="UTF-8-BOM")
+nback$groupe <- as.factor(nback$groupe)
+nback$subject_id <- as.factor(nback$subject_id)
+nback$part <- factor(nback$part, levels = c("2_back_pre", "2_back_post"))
+nback$id_2_back <- as.factor(nback$id_2_back)
+nback$trial_id <- as.factor(nback$trial_id)
+nback$rt <- as.numeric(nback$rt)
+
+nback[is.na(nback)] <- 0
+
+nback_correct <- nback %>%
+  filter(Target == 1 | Non.target == 1) %>%
+  select(-False.alarm, -Mismatch, -No.input)
+
+out_rt <- boxplot.stats(nback_correct$rt)$out
+nback_correct <- nback_correct %>%
+  filter(!rt %in% out_rt)
+
+nback_correct %>%
+  group_by(groupe, part) %>%
+  get_summary_stats(rt)
+
+```
+
+```{r}
+
+ggboxplot(nback_correct, x = "groupe", y = "rt", fill = "part")
+
+```
+
+```{r}
+ggdensity(nback_correct, x = "rt", fill = "part", facet.by = "groupe")
+```
+
+```{r}
+ggbarplot(nback_correct, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_sd")
+```
+
+```{r}
+nback_quant <- nback_correct %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(rt = quantile(rt, c(0.2, 0.4, 0.6, 0.8, 1)), q = c(0.2, 0.4, 0.6, 0.8, 1))
+nback_quant
+```
+
+```{r}
+nback_vincent <- nback_quant %>%
+  group_by(groupe, part, q) %>%
+  summarise(rt = mean(rt))
+nback_vincent
+```
+
+```{r}
+ggline(nback_vincent, x = "q", y = "rt", color = "part", facet.by = "groupe")
+```
+
+```{r}
+nback_caf <- nback %>%
+  filter(No.input == 0) %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(q = c(0.2, 0.4, 0.6, 0.8, 1),
+            rt = quantile(rt, c(0.2, 0.4, 0.6, 0.8, 1)), 
+            correct = quantile(Score, c(0.2, 0.4, 0.6, 0.8, 1)))
+
+nback_caf <- nback_caf %>%
+  group_by(groupe, part, q) %>%
+  summarise(correct = mean(correct), rt = mean(rt))
+
+nback_caf$rt <- round(nback_caf$rt)
+
+ggline(nback_caf, x = "rt", y = "correct", color = "part", facet.by = "groupe") +
+  rotate_x_text()
+
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

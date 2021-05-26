@@ -13,6 +13,7 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 library(xtable)
+library(wesanderson)
 
 ```
 
@@ -77,9 +78,13 @@ ggboxplot(nback_rt, x = "groupe", y = "rt", fill = "part")
 
 ```{r}
 
-ggdensity(nback_rt, x = "rt", fill = "part", main = "Densité RT", facet.by = "groupe")
+rt_densit <- ggdensity(nback_rt, x = "rt", fill = "part", main = "Densité RT", facet.by = "groupe") 
+rt_densit %>%
+  ggexport(filename = "Plots/rt_densit.pdf")
+rt_densit
 
 ```
+
 ```{r}
 
 ggqqplot(nback_rt, x = "rt", facet.by = c("groupe", "part"))
@@ -100,7 +105,13 @@ nback_rt %>%
 
 ```{r}
 
-ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_sd", main = "RT moyens")
+rt_means <- ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_sd", xlab = "Groupe", ylab = "Temps de réponse") +
+  scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
+
+rt_means %>%
+  ggexport(filename = "Plots/rt_means.pdf")
+
+rt_means
 
 ```
 
@@ -178,7 +189,13 @@ nback_score %>%
 
 
 ```{r}
-ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_sd", main = "Performances moyennes")
+perf <- ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_sd") +
+  scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
+
+perf %>%
+  ggexport(filename = "Plots/perf.pdf")
+
+perf
 ```
 
 

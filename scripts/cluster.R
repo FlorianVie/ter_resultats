@@ -3,6 +3,7 @@ library("factoextra")
 library(tidyverse)
 library(ggcorrplot)
 library(gridExtra)
+library(ggpubr)
 
 df <- read.csv("./data/acp.csv", sep = ";", row.names = 1) %>%
   select(c(-erreurs))
@@ -79,10 +80,6 @@ dfClustersMeans2 <- dfClusters %>%
   group_by(clust) %>%
   summarise_all(mean) %>%
   select(-groupe)
-
-View(dfClustersMeans2)
-
-
 
 
 

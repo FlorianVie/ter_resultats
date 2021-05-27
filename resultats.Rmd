@@ -115,6 +115,36 @@ rt_means
 
 ```
 
+### ANOVA
+
+```{r}
+
+nback_ind_rt <- nback_rt %>%
+  group_by(groupe, part, subject_id) %>%
+  summarise_if(is.numeric, mean)
+
+nback_ind_rt %>%
+  ungroup %>%
+  anova_test(dv = rt, wid = subject_id, between = groupe, within = part)
+
+```
+#### Controle
+
+```{r}
+nback_ind_rt %>%
+  filter(groupe == "control") %>%
+  ungroup %>%
+  anova_test(dv = Score, wid = subject_id, within = part)
+```
+
+#### Epuisement
+
+```{r}
+nback_ind_rt %>%
+  filter(groupe == "transc") %>%
+  ungroup %>%
+  anova_test(dv = Score, wid = subject_id, within = part)
+```
 
 
 
@@ -199,11 +229,42 @@ perf
 ```
 
 
+### ANOVA
+
 ```{r}
-sc_model <- lm(data = nback_score, Score~part+groupe)
-ggqqplot(residuals(sc_model), main = "Résidus - qqplot")
+ggqqplot(nback_score, x = "Score", facet.by = c("groupe", "part"))
 ```
 
+
+```{r}
+
+nback_ind_perf <- nback_score %>%
+  group_by(groupe, part, subject_id) %>%
+  summarise_if(is.numeric, mean)
+
+nback_ind_perf %>%
+  ungroup %>%
+  anova_test(dv = Score, wid = subject_id, between = groupe, within = part)
+
+```
+
+#### Controle
+
+```{r}
+nback_ind %>%
+  filter(groupe == "control") %>%
+  ungroup %>%
+  anova_test(dv = Score, wid = subject_id, within = part)
+```
+
+#### Epuisement
+
+```{r}
+nback_ind %>%
+  filter(groupe == "transc") %>%
+  ungroup %>%
+  anova_test(dv = Score, wid = subject_id, within = part)
+```
 
 ### Wilconxon
 

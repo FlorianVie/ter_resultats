@@ -1,11 +1,11 @@
 ---
 title: "TER - Résultats - rspan"
 output:
-  pdf_document: 
-    latex_engine: xelatex
   html_notebook:
     theme: default
     code_folding: hide
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 ```{r}
@@ -59,6 +59,13 @@ ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_sd", pos
 ## Rappel
 
 ```{r}
+recall %>%
+  group_by(groupe, part) %>%
+  get_summary_stats(sim)
+```
+
+
+```{r}
 
 ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"))
 
@@ -102,12 +109,52 @@ recall %>%
 ```
 
 
+# ANOVA
 
+## Phrases
 
+```{r}
+sent_ind <- sent %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise_if(is.numeric, mean)
 
+sent_ind %>%
+  ungroup%>%
+  anova_test(dv = correct, wid = subject_id, between = groupe, within = part) %>%
+  get_anova_table()
 
+```
 
+### "Part" par "groupe"
 
+```{r}
+sent_ind %>%
+  group_by(groupe) %>%
+  anova_test(dv = correct, wid = subject_id, within = part) %>%
+  get_anova_table()
+```
+
+## Recall
+
+```{r}
+sent_rec <- recall %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise_if(is.numeric, mean)
+
+sent_rec %>%
+  ungroup%>%
+  anova_test(dv = sim, wid = subject_id, between = groupe, within = part) %>%
+  get_anova_table()
+```
+
+### "Part" par "groupe"
+
+```{r}
+sent_rec %>%
+  group_by(groupe) %>%
+  anova_test(dv = sim, wid = subject_id, within = part) %>%
+  get_anova_table()
+```
 
 
 

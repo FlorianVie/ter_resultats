@@ -63,11 +63,16 @@ nback_vincent
 ```
 
 ```{r}
-ggline(nback_vincent, x = "q", y = "rt", color = "part", facet.by = "groupe")
+vi <- ggline(nback_vincent, x = "q", y = "rt", color = "part", facet.by = "groupe", size = 1)
+
+vi %>%
+  ggexport(filename = "Plots/vi.pdf")
+
+vi
 ```
 
 ```{r}
-nback_caf <- nback %>%
+nback_caf <- nback_score %>%
   filter(No.input == 0) %>%
   group_by(groupe, subject_id, part) %>%
   summarise(q = c(0.2, 0.4, 0.6, 0.8, 1),
@@ -80,14 +85,17 @@ nback_caf <- nback_caf %>%
 
 nback_caf$rt <- round(nback_caf$rt)
 
-ggline(nback_caf, x = "rt", y = "correct", color = "part", facet.by = "groupe") +
+caf <- ggline(nback_caf, x = "rt", y = "correct", color = "part", facet.by = "groupe", size = 1) +
   rotate_x_text()
 
+caf %>%
+  ggexport(filename = "Plots/caf.pdf")
+
+caf
+
 ```
 
-```{r}
 
-```
 
 
 

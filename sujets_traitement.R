@@ -13,8 +13,8 @@ sujets <- sujet %>%
   rename(Transc_diffic = `3`) %>%
   rename(Quest_diffic = `4`) %>%
   rename(Fatigue = `5`) %>%
-  rename(Recommencer = `6`)
+  rename(Recommencer = `6`) %>%
+  arrange(id_sujet)
 
-sujets %>%
-  group_by(groupe) %>%
-  cor_test(Recommencer, Transc_diffic)
+write.csv(sujets, file = "data/comp_sub.csv")
+

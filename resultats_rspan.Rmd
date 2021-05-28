@@ -159,6 +159,13 @@ sent_rec %>%
 
 
 
+```{r}
+recall_ind <- recall %>%
+  group_by(groupe, subject_id, part) %>%
+  get_summary_stats(sim, type = "mean_sd")
+
+write.csv(recall_ind, "data/recall_ind.csv")
+```
 
 
 

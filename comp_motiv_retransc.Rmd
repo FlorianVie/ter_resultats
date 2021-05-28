@@ -1,0 +1,133 @@
+---
+title: "Compréhension, Motivation & Retranscription"
+output: html_notebook
+---
+
+
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+
+ques <- read.csv2("data/recap.csv", sep = ",", fileEncoding="UTF-8-BOM")
+ques <- ques %>%
+  select(-id_subject, -back_1_level, -back_2_level)
+
+ques$id_sujet <- as.factor(ques$id_sujet)
+ques$groupe <- as.factor(ques$groupe)
+ques$Comprehension <- as.numeric(ques$Comprehension)
+ques$wm_pre <- as.numeric(ques$wm_pre)
+ques$wm_post <- as.numeric(ques$wm_post)
+
+```
+
+# Compréhension
+
+```{r}
+ques %>%
+  group_by(groupe, test) %>%
+  get_summary_stats(Comprehension, type = "mean_sd")
+```
+
+
+```{r}
+p_comp <- ggbarplot(ques, x = "groupe", y = "Comprehension", fill = "test", add = "mean_sd", position = position_dodge(0.8))
+
+p_comp
+```
+## Normale
+
+```{r}
+
+ggdensity(ques, x = "Comprehension", facet.by = c("groupe", "test"), add = "mean")
+
+```
+
+```{r}
+
+ggqqplot(ques, x = "Comprehension", facet.by = c("groupe", "test"))
+
+```
+
+```{r}
+ques %>%
+  group_by(groupe, test) %>%
+  shapiro_test(Comprehension)
+```
+
+## ANOVA
+
+
+```{r}
+ques %>%
+  anova_test(Comprehension ~ groupe*test)
+```
+
+
+```{r}
+ques %>%
+  group_by(test) %>%
+  anova_test(Comprehension ~ groupe)
+```
+
+```{r}
+ques %>%
+  tukey_hsd(Comprehension ~ groupe*test)
+```
+
+
+# Subjectives
+
+## Corrélations
+
+### Epuisement N-Back
+
+```{r}
+ques %>%
+  filter(groupe == "epuisement") %>%
+  filter(test == "nback") %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_plot(label = T)
+```
+
+### Epuisement RSPAN
+
+```{r}
+ques %>%
+  filter(groupe == "epuisement") %>%
+  filter(test == "rspan") %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_plot(label = T)
+```
+
+### Contrôle N-Back
+
+```{r}
+ques %>%
+  filter(groupe == "contrôle") %>%
+  filter(test == "nback") %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_plot(label = T)
+```
+
+### Contrôle RSPAN
+
+```{r}
+ques %>%
+  filter(groupe == "contrôle") %>%
+  filter(test == "rspan") %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_plot(label = T)
+```
+
+
+
+
+
+
+
+
+
+
+

@@ -30,6 +30,7 @@ nback$subject_id <- as.factor(nback$subject_id)
 nback$part <- factor(nback$part, levels = c("2_back_pre", "2_back_post"))
 nback$id_2_back <- as.factor(nback$id_2_back)
 nback$trial_id <- as.factor(nback$trial_id)
+nback$rt <- as.numeric(nback$rt)
 
 nback[is.na(nback)] <- 0
 
@@ -59,7 +60,7 @@ nback_rt <- nback
 
 nback_rt %>%
   group_by(groupe, part) %>%
-  get_summary_stats(rt)
+  get_summary_stats(rt, type = "mean_sd")
 
 ```
 
@@ -147,42 +148,6 @@ nback_ind_rt %>%
 ```
 
 
-
-```{r}
-
-rt_model <- lm(data = nback_rt, rt~part+groupe)
-ggqqplot(residuals(rt_model), main = "Résidus - qqplot")
-
-```
-
-### Wilconxon
-
-#### Effet du groupe
-
-```{r}
-
-rt_kruskal_g <- nback_rt %>%
-  group_by(part) %>%
-  wilcox_test(rt ~ groupe)
-
-rt_kruskal_g
-
-```
-
-
-#### Effet post-test
-
-```{r}
-
-rt_kruskal_t <- nback %>%
-  group_by(groupe) %>%
-  wilcox_test(rt ~ part, paired = T)
-
-rt_kruskal_t
-
-```
-
-
 ## Performances
 
 
@@ -193,7 +158,7 @@ nback_score <- nback %>%
 
 nback_score %>%
   group_by(groupe, part) %>%
-  get_summary_stats(Score)
+  get_summary_stats(Score, type = "mean_sd")
 ```
 
 ```{r}
@@ -202,7 +167,7 @@ ggboxplot(nback_score, x = "groupe", y = "Score", fill = "part")
 
 
 ```{r}
-ggdensity(nback_score, x = "Score", fill = "part", main = "Densité Performances", facet.by = "groupe")
+ggdensity(nback_score, x = "Score", fill = "part", main = "Densité Performances", facet.by = c("groupe", "part"), add = "mean")
 ```
 
 ```{r}
@@ -251,7 +216,7 @@ nback_ind_perf %>%
 #### Controle
 
 ```{r}
-nback_ind %>%
+nback_ind_perf %>%
   filter(groupe == "control") %>%
   ungroup %>%
   anova_test(dv = Score, wid = subject_id, within = part)
@@ -260,60 +225,21 @@ nback_ind %>%
 #### Epuisement
 
 ```{r}
-nback_ind %>%
+nback_ind_perf %>%
   filter(groupe == "transc") %>%
   ungroup %>%
   anova_test(dv = Score, wid = subject_id, within = part)
 ```
 
-### Wilconxon
-
-#### Effet du groupe
-
 ```{r}
+nbackZ <- nback_score
+nbackZ$Score <- scale(nbackZ$Score)
 
-sc_kruskal_g <- nback_score %>%
-  group_by(part) %>%
-  wilcox_test(Score ~ groupe)
-sc_kruskal_g
+nbackZ %>%
+  group_by(groupe, part) %>%
+  get_summary_stats(Score, type = "mean_sd")
 
 ```
-
-
-#### Effet post-test
-
-```{r}
-
-sc_kruskal_t <- nback_score %>%
-  group_by(groupe) %>%
-  wilcox_test(Score ~ part, paired = T)
-sc_kruskal_t
-
-```
-
-
-
-# Delta
-
-```{r}
-
-nback_delta <- nback_score %>% 
-  group_by(groupe, subject_id, part) %>%
-  summarise(Score = mean(Score), rt = mean(rt)) %>%
-  pivot_wider(names_from = part, values_from = c(Score, rt)) %>%
-  mutate(Score_delta = Score_2_back_pre - Score_2_back_post) %>%
-  mutate(Score_delta = round(Score_delta, 4)) %>%
-  mutate(rt_delta = rt_2_back_pre - rt_2_back_post) %>%
-  mutate(rt_delta = round(rt_delta, 4))
-
-nback_delta %>%
-  group_by(groupe) %>%
-  summarise_if(is.numeric, c(mean))
-
-```
-
-
-
 
 
 

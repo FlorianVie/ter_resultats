@@ -12,6 +12,7 @@ library(rstatix)
 
 ques <- read.csv2("data/recap.csv", sep = ",", fileEncoding="UTF-8-BOM")
 ques <- ques %>%
+  filter(id_subject != "4") %>%
   select(-id_subject, -back_1_level, -back_2_level)
 
 ques$id_sujet <- as.factor(ques$id_sujet)
@@ -87,7 +88,7 @@ ques %>%
 ques %>%
   filter(groupe == "epuisement") %>%
   filter(test == "nback") %>%
-  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post, erreurs, reformulation, non_transc) %>%
   cor_plot(label = T)
 ```
 
@@ -97,7 +98,7 @@ ques %>%
 ques %>%
   filter(groupe == "epuisement") %>%
   filter(test == "rspan") %>%
-  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
+  cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post, erreurs, reformulation, non_transc) %>%
   cor_plot(label = T)
 ```
 

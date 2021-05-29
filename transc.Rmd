@@ -1,0 +1,131 @@
+---
+title: "Transcription"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+
+transc <- read.csv2("data/transc.csv", sep = ",", fileEncoding="UTF-8-BOM")
+transc$subject_id <- as.factor(transc$subject_id)
+transc$audio <- as.factor(transc$audio)
+transc$exi <- as.numeric(transc$exi)
+
+transc[is.na(transc)] <- 0
+
+transc <- transc %>%
+  filter(subject_id != 4)
+
+transc %>%
+  group_by(test) %>%
+  summarise_if(is.numeric, mean)
+
+```
+
+
+```{r}
+transc_int <- transc %>%
+  mutate(intervalle = ntile(audio, 5)) %>%
+  group_by(test, subject_id, intervalle) %>%
+  summarise_if(is.numeric, sum) %>%
+  group_by(test, intervalle) %>%
+  summarise_if(is.numeric, mean)
+
+transc_int$intervalle <- as.factor(transc_int$intervalle)
+
+```
+
+
+```{r}
+ggline(transc_int, x = "intervalle", y = "erreurs", color = "test")
+```
+
+```{r}
+ggline(transc_int, x = "intervalle", y = "nt", color = "test")
+```
+
+```{r}
+ggbarplot(transc_int, x = "intervalle", y = "ref", facet.by = "test", fill = "exi", add = "mean_sd")
+```
+
+
+
+```{r}
+transc_11 <- transc %>%
+  mutate(intervalle = ntile(audio, 11)) %>%
+  group_by(subject_id, intervalle) %>%
+  summarise(erreurs = sum(erreurs), nt = sum(nt), exi = mean(exi), test = test)
+
+ggbarplot(transc_11, x = "intervalle", y = c("nt", "erreurs"), fill = "exi", add = "mean_sd")
+
+```
+
+```{r}
+transc_11 %>%
+  group_by(intervalle) %>%
+  summarise_if(is.numeric, mean) %>%
+  cor_mat(erreurs, nt, exi, intervalle) %>%
+  cor_plot(label = T)
+```
+
+```{r}
+transc$audio <- as.numeric(transc$audio)
+
+transc_cor <- transc %>%
+  group_by(audio) %>%
+  summarise_if(is.numeric, mean)
+
+cor.test(transc_cor$exi, transc_cor$nt)
+
+transc_cor %>%
+  cor_mat(erreurs, nt, exi, audio, method = "spearman")
+```
+
+```{r}
+transc %>%
+  group_by(audio) %>%
+  summarise_if(is.numeric, mean) %>%
+  cor_pmat(erreurs, nt, exi, audio, method = "spearman")
+```
+
+
+```{r}
+transc$audio <- as.numeric(transc$audio)
+transc %>%
+  group_by(audio) %>%
+  summarise_if(is.numeric, mean) %>%
+  cor_mat(erreurs, nt, exi, audio, method = "spearman") %>%
+  cor_plot(label = T)
+```
+
+```{r}
+transc %>%
+  group_by(subject_id) %>%
+  summarize_if(is.numeric, sum) %>%
+  get_summary_stats(c(nt, erreurs, coq, gram, lex, ref), type = "mean_sd")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,172 @@
+---
+title: "Analyse Factorielle Multiple"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(xtable)
+library("FactoMineR")
+library("factoextra")
+library(ggcorrplot)
+
+recap <- read.csv2("data/recap.csv", sep = ",", fileEncoding="UTF-8-BOM", row.names = 1)
+recap$Comprehension <- as.numeric(recap$Comprehension)
+recap$wm_pre <- as.numeric(recap$wm_pre)
+recap$wm_post <- as.numeric(recap$wm_post)
+
+data <- recap %>%
+  filter(groupe == "epuisement") %>%
+  select(-id_subject, -back_1_level, -back_2_level, -oxford, -sexe, -age, -groupe)
+
+prepost <- data %>% select(wm_pre, wm_post)
+
+```
+
+
+# AFM
+
+```{r}
+res.mfa <- MFA(data, group = c(1, 1, 6, 1, 2, 3), ncp = 20, name.group = c("Frappe", "Groupe", "Subjective", "Comprehension", "WM", "Transcription"), type = c("s", "n", "s", "s", "s", "s"))
+
+#res.mfa <- MFA(data, group = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3), ncp = 20, name.group = c("Frappe", "Groupe", "Pre_motiv", "Mem_diffic", "Transc_diffic", "Quest_diffic", "Fatigue", "Recommencer", "Comprehension", "WM", "Transcription"), type = c("s", "n", "s", "s", "s", "s", "s", "s", "s", "s", "s"))
+
+```
+
+## Valeurs propres
+
+```{r}
+eig.val <- get_eigenvalue(res.mfa)
+head(eig.val)
+```
+
+```{r}
+fviz_screeplot(res.mfa)
+```
+
+## Variables
+
+```{r}
+group <- get_mfa_var(res.mfa, "group")
+fviz_mfa_var(res.mfa, "group")
+```
+
+```{r}
+# Contribution à la première dimension
+fviz_contrib (res.mfa, "group", axes = 1)
+# Contribution à la deuxième dimension
+fviz_contrib (res.mfa, "group", axes = 2)
+```
+
+
+### Variables quantitatives
+
+```{r}
+quanti.var <- get_mfa_var(res.mfa, "quanti.var")
+fviz_mfa_var(res.mfa, "quanti.var", palette = "jco", col.var.sup = "violet", repel = TRUE)
+```
+
+
+```{r}
+# Contributions à la dimension 1
+dim_1 <- fviz_contrib (res.mfa, choice = "quanti.var", axes = 1, top = 20, palette = "jco")
+dim_1
+```
+
+
+```{r}
+# Contributions à la dimension 2
+dim_2 <- fviz_contrib (res.mfa, choice = "quanti.var", axes = 2, top = 20, palette = "jco")
+dim_2
+```
+
+```{r}
+contrib_cercle <- fviz_mfa_var(res.mfa, "quanti.var", col.var = "contrib", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             col.var.sup = "violet", repel = TRUE,
+             geom = c("point", "text"))
+
+contrib_cercle
+```
+
+## Individus
+
+```{r}
+ind <- get_mfa_ind(res.mfa)
+fviz_mfa_ind(res.mfa, col.ind = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+```
+
+```{r}
+res.hcpc <- HCPC(res.mfa, graph = FALSE)
+
+corr <- cor(df%>%select(-groupe))
+mat.p <- cor_pmat(df%>%select(-groupe))
+ggcorrplot(corr, type = "upper", ggtheme = theme_minimal(), colors = c("#6D9EC1", "white", "#E46726"), lab = T, lab_size = 3, p.mat = mat.p)
+
+
+```
+
+# Classification hierachique
+
+```{r}
+fviz_dend(res.hcpc, cex = 0.7, palette = "jco", show_labels = T)
+clust_plot <- fviz_cluster(res.hcpc, geom = "point", palette = "jco", ggtheme = theme_minimal())
+
+```
+
+```{r}
+clust_plot
+```
+
+
+```{r}
+dfClusters <- res.hcpc$data.clust
+
+dfClusters$pre_test <- prepost$wm_pre
+dfClusters$post_test <- prepost$wm_post
+
+clustplot <- dfClusters %>%
+  pivot_longer(c(wm_pre, wm_post), names_to = "part", values_to = "score")
+clustplot$part <- factor(clustplot$part, levels = c("wm_pre", "wm_post"))
+#clustplot$score <- round(clustplot$score, 3)
+
+ggbarplot(clustplot, x = "clust", y = "score", add = "mean_sd", fill = "part", position = position_dodge(0.9), facet.by = "test")
+
+```
+
+```{r}
+clustplot %>%
+  group_by(clust, test, part) %>%
+  get_summary_stats(score, type = "mean_sd")
+```
+
+```{r}
+clustplot$subject_id <- rownames(clustplot)
+
+clustplot %>%
+  filter(!duplicated(subject_id))
+
+clustplot %>%
+  anova_test(dv = score, within = part, between = clust, wid = subject_id)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

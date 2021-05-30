@@ -65,13 +65,6 @@ ques %>%
   anova_test(Comprehension ~ groupe*test)
 ```
 
-
-```{r}
-ques %>%
-  group_by(test) %>%
-  anova_test(Comprehension ~ groupe)
-```
-
 ```{r}
 ques %>%
   tukey_hsd(Comprehension ~ groupe*test)
@@ -92,6 +85,16 @@ ques %>%
   cor_plot(label = T)
 ```
 
+
+```{r}
+ques_nback_transc <- ques %>%
+  filter(groupe == "epuisement") %>%
+  filter(test == "nback")
+
+cor.test(ques_nback_transc$wm_pre, ques_nback_transc$wm_post, method = "pearson")
+
+```
+
 ### Epuisement RSPAN
 
 ```{r}
@@ -102,7 +105,19 @@ ques %>%
   cor_plot(label = T)
 ```
 
-### Contrôle N-Back
+```{r}
+ques_rspan_transc <- ques %>%
+  filter(groupe == "epuisement") %>%
+  filter(test == "rspan")
+
+cor.test(ques_rspan_transc$wm_pre, ques_rspan_transc$wm_post, method = "pearson")
+```
+
+
+## Contrôle N-Back
+
+
+
 
 ```{r}
 ques %>%
@@ -110,6 +125,15 @@ ques %>%
   filter(test == "nback") %>%
   cor_mat(Pre_motiv, Mem_diffic, Transc_diffic, Quest_diffic, Fatigue, Recommencer, Comprehension, wm_pre, wm_post) %>%
   cor_plot(label = T)
+```
+
+```{r}
+ques_nback_cont <- ques %>%
+  filter(groupe == "contrôle") %>%
+  filter(test == "nback")
+
+cor.test(ques_nback_cont$wm_pre, ques_nback_cont$wm_post, method = "pearson")
+
 ```
 
 ### Contrôle RSPAN
@@ -122,6 +146,13 @@ ques %>%
   cor_plot(label = T)
 ```
 
+```{r}
+ques_rspan_cont <- ques %>%
+  filter(groupe == "contrôle") %>%
+  filter(test == "rspan")
+
+cor.test(ques_rspan_cont$wm_pre, ques_rspan_cont$wm_post, method = "pearson")
+```
 
 
 

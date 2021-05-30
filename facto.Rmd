@@ -145,13 +145,25 @@ clustplot %>%
 ```{r}
 clustplot$subject_id <- rownames(clustplot)
 
-clustplot %>%
+clustplot <- clustplot %>%
   filter(!duplicated(subject_id))
 
-clustplot %>%
-  anova_test(dv = score, within = part, between = clust, wid = subject_id)
+clust_aov <- clustplot %>%
+  group_by(clust, test, subject_id) %>%
+  summarise_if(is.numeric, mean) %>%
+  pivot_longer(cols = c(pre_test, post_test), values_to = "Score", names_to = "part")
+
+clust_aov$part <- factor(clust_aov$part, levels = c("pre_test", "post_test"))
+
+ggbarplot(clust_aov, x = "clust", y = "Score", add = "mean_sd", fill = "part", position = position_dodge(0.9), facet.by = c("test"))
+
 ```
 
+```{r}
+clust_aov %>%
+  group_by(clust, test) %>%
+  anova_test(dv = Score, wid = subject_id, within = part)
+```
 
 
 

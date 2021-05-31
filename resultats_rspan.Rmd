@@ -42,6 +42,16 @@ sent %>%
 
 ```
 
+
+```{r}
+recall %>%
+  group_by(groupe, subject_id) %>%
+  summarise(sim = mean(sim)) %>%
+  group_by(groupe) %>%
+  get_summary_stats(sim, type = "mean_sd")
+```
+
+
 ```{r}
 
 ggdensity(sent, x = "correct", fill = "part", facet.by = "groupe")

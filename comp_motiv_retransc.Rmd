@@ -25,6 +25,13 @@ ques$Comprehension <- as.numeric(ques$Comprehension)
 ques$wm_pre <- as.numeric(ques$wm_pre)
 ques$wm_post <- as.numeric(ques$wm_post)
 
+ques %>%
+  filter(test == "rspan") %>%
+  group_by(groupe, id_sujet) %>%
+  summarise_all(mean) %>%
+  group_by(groupe) %>%
+  get_summary_stats(Comprehension, type = "mean_sd")
+
 ```
 
 # Compréhension

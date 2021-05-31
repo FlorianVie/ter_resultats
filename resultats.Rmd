@@ -246,9 +246,24 @@ nbackZ %>%
 
 # Delta
 
+```{r}
+nback_delta <- nback_score %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(Score = mean(Score)) %>%
+  pivot_wider(names_from = part, values_from = Score) %>%
+  mutate(delta = `2_back_pre` - `2_back_post`)
 
+nback_delta %>%
+  group_by(groupe) %>%
+  get_summary_stats(delta, type = "mean_sd")
 
+```
 
+```{r}
+nback_delta %>%
+  ungroup %>%
+  anova_test(dv = delta, between = groupe)
+```
 
 
 

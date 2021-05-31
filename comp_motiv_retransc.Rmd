@@ -1,6 +1,10 @@
 ---
 title: "Compréhension, Motivation & Retranscription"
-output: html_notebook
+output:
+  html_notebook:
+    theme: default
+    code_folding: hide
+  pdf_document: default
 ---
 
 

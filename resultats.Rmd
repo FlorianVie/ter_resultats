@@ -106,7 +106,7 @@ nback_rt %>%
 
 ```{r}
 
-rt_means <- ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_sd", xlab = "Groupe", ylab = "Temps de réponse") +
+rt_means <- ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_se", xlab = "Groupe", ylab = "Temps de réponse") +
   scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
 
 rt_means %>%
@@ -184,7 +184,7 @@ nback_score %>%
 
 
 ```{r}
-perf <- ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_sd") +
+perf <- ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_se") +
   scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
 
 perf %>%
@@ -209,7 +209,7 @@ nback_ind_perf <- nback_score %>%
 
 nback_ind_perf %>%
   ungroup %>%
-  anova_test(dv = Score, wid = subject_id, between = groupe, within = part)
+  anova_test(dv = Score, wid = subject_id, between = groupe, within = part, type = "3")
 
 ```
 

@@ -28,6 +28,10 @@ rspan$size <- factor(rspan$size, levels = c("4.0", "5.0", "6.0"))
 rspan$sim <- as.numeric(rspan$sim)
 rspan$dsit <- as.numeric(rspan$dist)
 
+rspan <- rspan %>%
+  filter(subject_id != 4) %>%
+  filter(subject_id != 30)
+
 recall <- rspan %>%
   filter(part != 'sentence-pre') %>%
   filter(part != 'sentence-post')
@@ -37,8 +41,9 @@ sent <- rspan %>%
   filter(part != 'recall-post')
 
 sent %>%
-  group_by(groupe, part) %>%
-  get_summary_stats(correct)
+  group_by(groupe, part, subject_id) %>%
+  summarise(correct = mean(correct)) %>%
+  get_summary_stats(correct, type = "mean_sd")
 
 ```
 
@@ -61,7 +66,7 @@ ggdensity(sent, x = "correct", fill = "part", facet.by = "groupe")
 
 ```{r}
 
-ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_sd", position = position_dodge(0.8))
+ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_se", position = position_dodge(0.8))
 
 ```
 
@@ -70,8 +75,10 @@ ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_sd", pos
 
 ```{r}
 recall %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(sim = mean(sim)) %>%
   group_by(groupe, part) %>%
-  get_summary_stats(sim)
+  get_summary_stats(sim, type = "mean_sd")
 ```
 
 
@@ -84,39 +91,16 @@ ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"))
 
 ```{r}
 
-ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_sd", position = position_dodge(0.8))
+ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8))
 
 ```
 
 ```{r}
 
-ggboxplot(recall, x = "size", y = "sim", fill = "part", facet.by = "groupe")
+ggbarplot(recall, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe")
 
 ```
 
-
-```{r}
-
-ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_sd", position = position_dodge(0.8), facet.by = "size")
-
-```
-
-
-```{r}
-
-recall %>%
-  group_by(groupe) %>%
-  wilcox_test(sim ~ part, paired = T)
-
-```
-
-```{r}
-
-recall %>%
-  group_by(groupe, size) %>%
-  wilcox_test(sim ~ part, paired = T)
-
-```
 
 
 # ANOVA
@@ -165,6 +149,79 @@ sent_rec %>%
   anova_test(dv = sim, wid = subject_id, within = part) %>%
   get_anova_table()
 ```
+
+### Size
+
+```{r}
+rec_size <- recall %>%
+  group_by(groupe, subject_id, part, size) %>%
+  summarise(sim = mean(sim))
+
+rec_size %>%
+  ungroup %>%
+  group_by(groupe) %>%
+  anova_test(dv = sim, within = c(size, part), wid = subject_id) %>%
+  get_anova_table()
+```
+
+```{r}
+rec_size %>%
+  ungroup %>%
+  group_by(groupe, part) %>%
+  anova_test(dv = sim, within = size, wid = subject_id) %>%
+  get_anova_table()
+```
+
+```{r}
+rec_size %>%
+  ungroup %>%
+  group_by(groupe, size) %>%
+  pairwise_t_test(sim ~ part, paired = T) 
+```
+
+```{r}
+
+ggbarplot(rec_size, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe")
+
+```
+
+
+# Corrélation
+
+```{r}
+rec_cor_transc <- rec_size %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(sim = mean(sim)) %>%
+  pivot_wider(names_from = part, values_from = sim) %>%
+  ungroup %>%
+  filter(groupe == "transc")
+
+cor.test(rec_cor_transc$`recall-post`, rec_cor_transc$`recall-pre`)
+
+```
+
+```{r}
+rec_cor_cont <- rec_size %>%
+  group_by(groupe, subject_id, part) %>%
+  summarise(sim = mean(sim)) %>%
+  pivot_wider(names_from = part, values_from = sim) %>%
+  ungroup %>%
+  filter(groupe == "control")
+
+cor.test(rec_cor_cont$`recall-post`, rec_cor_cont$`recall-pre`)
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 

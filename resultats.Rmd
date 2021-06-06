@@ -72,14 +72,14 @@ out_rt <- boxplot.stats(nback_rt$rt)$out
 nback_rt <- nback_rt %>%
   filter(!rt %in% out_rt)
 
-ggboxplot(nback_rt, x = "groupe", y = "rt", fill = "part")
+ggboxplot(nback_rt, x = "groupe", y = "rt", fill = "part", palette = "jco")
 
 
 ```
 
 ```{r}
 
-rt_densit <- ggdensity(nback_rt, x = "rt", fill = "part", main = "Densité RT", facet.by = "groupe") 
+rt_densit <- ggdensity(nback_rt, x = "rt", fill = "part", main = "Densité RT", facet.by = "groupe", palette = "jco") 
 rt_densit %>%
   ggexport(filename = "Plots/rt_densit.pdf")
 rt_densit
@@ -106,8 +106,7 @@ nback_rt %>%
 
 ```{r}
 
-rt_means <- ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_se", xlab = "Groupe", ylab = "Temps de réponse") +
-  scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
+rt_means <- ggbarplot(nback_rt, x = "groupe", y = "rt", fill = "part", position = position_dodge(0.8), add = "mean_se", xlab = "Groupe", ylab = "Temps de réponse", palette = "jco")
 
 rt_means %>%
   ggexport(filename = "Plots/rt_means.pdf")
@@ -162,12 +161,12 @@ nback_score %>%
 ```
 
 ```{r}
-ggboxplot(nback_score, x = "groupe", y = "Score", fill = "part")
+ggboxplot(nback_score, x = "groupe", y = "Score", fill = "part", palette = "jco")
 ```
 
 
 ```{r}
-ggdensity(nback_score, x = "Score", fill = "part", main = "Densité Performances", facet.by = c("groupe", "part"), add = "mean")
+ggdensity(nback_score, x = "Score", fill = "part", main = "Densité Performances", facet.by = c("groupe", "part"), add = "mean", palette = "jco")
 ```
 
 ```{r}
@@ -184,8 +183,7 @@ nback_score %>%
 
 
 ```{r}
-perf <- ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_se") +
-  scale_fill_discrete(name = "Moment", labels = c("Pré-test", "Post-test"))
+perf <- ggbarplot(nback_score, x = "groupe", y = "Score", fill = "part", position = position_dodge(0.8), add = "mean_se", palette = "jco")
 
 perf %>%
   ggexport(filename = "Plots/perf.pdf")

@@ -40,26 +40,33 @@ sent <- rspan %>%
   filter(part != 'recall-pre') %>%
   filter(part != 'recall-post')
 
-sent %>%
+sent <- sent %>%
   group_by(groupe, part, subject_id) %>%
-  summarise(correct = mean(correct)) %>%
+  summarise(correct = mean(correct)) 
+
+sent %>%
   get_summary_stats(correct, type = "mean_sd")
+
 
 ```
 
 
 ```{r}
+recall <- recall %>%
+  group_by(groupe, subject_id, part, size) %>%
+  summarise(sim = mean(sim))
+
 recall %>%
-  group_by(groupe, subject_id) %>%
-  summarise(sim = mean(sim)) %>%
-  group_by(groupe) %>%
+  group_by(groupe, part, size) %>%
   get_summary_stats(sim, type = "mean_sd")
+
 ```
 
 
 ```{r}
 
 ggdensity(sent, x = "correct", fill = "part", facet.by = "groupe")
+ggqqplot(sent, x="correct", facet.by = c("groupe", "part"))
 
 ```
 
@@ -73,19 +80,18 @@ ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_se", pos
 
 ## Rappel
 
-```{r}
-recall %>%
-  group_by(groupe, subject_id, part) %>%
-  summarise(sim = mean(sim)) %>%
-  group_by(groupe, part) %>%
-  get_summary_stats(sim, type = "mean_sd")
-```
-
 
 ```{r}
 
 ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"))
+ggqqplot(recall, x = "sim", color = "part", facet.by = c("groupe", "part"))
 
+```
+
+```{r}
+recall %>%
+  group_by(groupe, part) %>%
+  shapiro_test(sim)
 ```
 
 

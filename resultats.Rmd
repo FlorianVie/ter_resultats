@@ -231,20 +231,24 @@ nback_ind_perf %>%
   anova_test(dv = Score, wid = subject_id, within = part)
 ```
 
-```{r}
-nbackZ <- nback_score
-nbackZ$Score <- scale(nbackZ$Score)
+### Wilcoxon
 
-nbackZ %>%
-  group_by(groupe, part) %>%
-  get_summary_stats(Score, type = "mean_sd")
+```{r}
+nback_ind_perf %>%
+  group_by(part) %>%
+  wilcox_test(Score ~ groupe)
+```
+
+```{r}
+nback_ind_perf %>%
+  group_by(groupe) %>%
+  wilcox_test(Score ~ part, paired = T) %>%
+  add_significance()
 
 ```
 
 
-
-
-# Delta
+## Delta
 
 ```{r}
 nback_delta <- nback_score %>%

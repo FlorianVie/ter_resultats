@@ -44,7 +44,10 @@ ques %>%
 
 
 ```{r}
-p_comp <- ggbarplot(ques, x = "groupe", y = "Comprehension", fill = "test", add = "mean_sd", position = position_dodge(0.8))
+p_comp <- ggbarplot(ques, x = "groupe", y = "Comprehension", fill = "test", add = "mean_se", position = position_dodge(0.8))
+
+p_comp %>%
+  ggexport(filename = "Plots/comp.pdf")
 
 p_comp
 ```
@@ -166,10 +169,30 @@ cor.test(ques_rspan_cont$wm_pre, ques_rspan_cont$wm_post, method = "pearson")
 ```
 
 
+```{r}
+ques %>%
+  group_by(groupe, test) %>%
+  get_summary_stats(Fatigue, type = "mean_sd")
+```
 
 
+```{r}
+p_fat <- ggbarplot(ques, x = "groupe", y = "Fatigue", fill = "test", add = "mean_se", position = position_dodge(0.8))
 
+p_fat %>%
+  ggexport(filename = "Plots/fatigue.pdf")
 
+p_fat
+```
+
+```{r}
+p_dif <- ggbarplot(ques, x = "groupe", y = "Mem_diffic", fill = "test", add = "mean_se", position = position_dodge(0.8))
+
+p_dif %>%
+  ggexport(filename = "Plots/diffi.pdf")
+
+p_dif
+```
 
 
 

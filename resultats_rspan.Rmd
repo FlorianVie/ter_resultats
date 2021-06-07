@@ -73,7 +73,7 @@ ggqqplot(sent, x="correct", facet.by = c("groupe", "part"))
 
 ```{r}
 
-ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_se", position = position_dodge(0.8))
+ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_se", position = position_dodge(0.8), palette = "jco")
 
 ```
 
@@ -83,8 +83,8 @@ ggbarplot(sent, x = "groupe", y = "correct", fill = "part", add = "mean_se", pos
 
 ```{r}
 
-ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"))
-ggqqplot(recall, x = "sim", color = "part", facet.by = c("groupe", "part"))
+ggdensity(recall, x = "sim", fill = "part", facet.by = c("groupe", "size"), palette = "jco")
+ggqqplot(recall, x = "sim", color = "part", facet.by = c("groupe", "part"), palette = "jco")
 
 ```
 
@@ -97,17 +97,42 @@ recall %>%
 
 ```{r}
 
-ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8))
+rspan_score <- ggbarplot(recall, x = "groupe", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), palette = "jco")
+
+rspan_score %>%
+  ggexport(filename = "Plots/rspan_score.pdf")
+
+rspan_score
 
 ```
 
 ```{r}
 
-ggbarplot(recall, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe")
+recall_transc <- recall %>%
+  filter(groupe == "transc")
+
+rspan_size_transc <- ggbarplot(recall_transc, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe", palette = "jco")
+
+rspan_size_transc %>%
+  ggexport(filename = "Plots/rspan_size_transc.pdf", pointsize = 14)
+
+rspan_size_transc
 
 ```
 
+```{r}
 
+recall_control <- recall %>%
+  filter(groupe == "control")
+
+rspan_size_control <- ggbarplot(recall_control, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe", palette = "jco")
+
+rspan_size_control %>%
+  ggexport(filename = "Plots/rspan_size_control.pdf")
+
+rspan_size_control
+
+```
 
 # ANOVA
 
@@ -187,7 +212,7 @@ rec_size %>%
 
 ```{r}
 
-ggbarplot(rec_size, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe")
+ggbarplot(rec_size, x = "size", y = "sim", fill = "part", add = "mean_se", position = position_dodge(0.8), facet.by = "groupe", palette = "jco")
 
 ```
 

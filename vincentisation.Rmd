@@ -67,7 +67,7 @@ nback_vincent
 ```
 
 ```{r}
-vi <- ggline(nback_vincent, x = "q", y = "rt", color = "part", facet.by = "groupe", size = 1)
+vi <- ggline(nback_vincent, x = "q", y = "rt", color = "part", facet.by = "groupe", size = 1, palette = "jco")
 
 vi %>%
   ggexport(filename = "Plots/vi.pdf")
@@ -89,7 +89,7 @@ nback_caf <- nback_caf %>%
 
 nback_caf$rt <- round(nback_caf$rt)
 
-caf <- ggline(nback_caf, x = "rt", y = "correct", color = "part", facet.by = "groupe", size = 1) +
+caf <- ggline(nback_caf, x = "rt", y = "correct", color = "part", facet.by = "groupe", size = 1, palette = "jco") +
   rotate_x_text()
 
 caf %>%

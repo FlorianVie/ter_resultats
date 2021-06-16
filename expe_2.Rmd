@@ -11,7 +11,38 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 
-plot(cars)
+d <- read.csv("data/expe_2.csv", sep = ",", fileEncoding="UTF-8-BOM")
+d
 ```
+
+
+
+```{r}
+ggbarplot(d, x = "Participants", "Mots.nn.transcrits", fill = "Groupe")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
